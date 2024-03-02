@@ -1,9 +1,8 @@
 # ARM Analysis and Visualization
 
-![arm64monokai](./img/arm64_solarized.png)
-![arm64solarized](./img/arm64_monokai.png)
+![arm64solarized](./img/arm64_solarized.png)
 
-These images are a visual representation of the ARM64 instruction, with all
+This images are a visual representation of the ARM64 instruction, with all
 instructions plotted over a Hilbert curve and colored according to their
 instruction class (`general`, `float`, `advsimd`, `sve`, etc...).
 
@@ -30,5 +29,7 @@ To generate the images from scratch, first download the MRA for AArch64 and extr
 $ arm-classify MRA_ISA > data/arm64.json
 $ arm-gen -o data/arm64.dat
 $ arm-map -data data/arm64.dat -json data/arm64.json > data/arm64.map
-$ arm-vis -o img/arm64.png -theme solarized data/arm64.map
+$ arm-vis -o img/arm64.png -theme monokai data/arm64.map
 ```
+
+![arm64monokai](./img/arm64_monokai.png)
