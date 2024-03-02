@@ -2,7 +2,7 @@
 
 ![arm64solarized](./img/arm64_solarized.png)
 
-This images are a visual representation of the ARM64 instruction, with all
+This image is a visual representation of the ARM64 instruction, with all
 instructions plotted over a Hilbert curve and colored according to their
 instruction class (`general`, `float`, `advsimd`, `sve`, etc...).
 
@@ -23,7 +23,10 @@ The tools consist of
 
 # Generating Images
 
-To generate the images from scratch, first download the MRA for AArch64 and extract it. Then run the following commands, which may take a long time (multiple hours) and use about 9G of disk space. Long commands will print the execution percentage as they run.
+To generate the images from scratch, first download the MRA for AArch64 and
+extract it. Then run the following commands, which may take a long time
+(multiple hours) and use about 9G of disk space. Long commands will print the
+execution percentage as they run.
 
 ```
 $ arm-classify MRA_ISA > data/arm64.json

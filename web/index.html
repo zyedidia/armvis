@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="canvas" width="4096" height="4096" style="image-rendering: pixelated;"></canvas>
+
+<script type='text/javascript' src='./js/panzoom.min.js'></script>
+<script type='text/javascript' src="./js/capstone-arm64.min.js"></script>
+
+<script>
+var c = document.getElementById("canvas");
+var ctx = c.getContext("2d");
+drawing = new Image();
+drawing.src = "arm64.png";
+drawing.onload = function() {
+    ctx.drawImage(drawing, 0, 0, 4096, 4096);
+};
+var disas = new cs.Capstone(cs.ARCH_ARM64);
+c.onmousemove = ev => {
+    const coord = getMousePos(c, ev);
+    mouseMove(coord.x, coord.y);
+};
+
+const zoom = Panzoom(c, {
+  maxScale: 200,
+  cursor: ''
+});
+c.addEventListener('wheel', zoom.zoomWithWheel);
+
+function xyToHilbert(x, y, order) {
+    let s = 0;
+    for (let i = order - 1; i >= 0; i--) {
+        const xi = (x >> i) & 1;
+        const yi = (y >> i) & 1;
+        if (yi == 0) {
+            const tmp = x;
+            x = y ^ (-xi);
+            y = tmp ^ (-xi);
+        }
+        s = 4 * s + 2 * xi + (xi ^ yi);
+    }
+    return s;
+}
+
+function mouseMove(x, y) {
+    let s = xyToHilbert(x, y, 12)
+    let insn = s * 256;
+    // console.log(x, y, disas.disasm(insn, 0));
+    let buf = [
+        (insn & 0xff000000) >> 24,
+        (insn & 0x00ff0000) >> 16,
+        (insn & 0x0000ff00) >> 8,
+        (insn & 0x000000ff)
+    ];
+    console.log(buf)
+    let instructions = disas.disasm(buf, 0);
+}
+
+function getMousePos(canvas, ev) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+        x: (((ev.clientX - rect.left) / (rect.right - rect.left)) * canvas.width) | 0,
+        y: (((ev.clientY - rect.top) / (rect.bottom - rect.top)) * canvas.height) | 0
+    };
+}
+</script>
+
+</body>
+</html>
