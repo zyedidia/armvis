@@ -34,6 +34,30 @@ const (
 	InstrNumIDs
 )
 
+func IDToClass(class uint8) string {
+	switch class {
+	case InstrGeneralID:
+		return InstrGeneral
+	case InstrSystemID:
+		return InstrSystem
+	case InstrFloatID:
+		return InstrFloat
+	case InstrFpSimdID:
+		return InstrFpSimd
+	case InstrAdvSimdID:
+		return InstrAdvSimd
+	case InstrSveID:
+		return InstrSve
+	case InstrSve2ID:
+		return InstrSve2
+	case InstrMortlachID:
+		return InstrMortlach
+	case InstrMortlach2ID:
+		return InstrMortlach2
+	}
+	return "other"
+}
+
 func ClassToID(class string) uint8 {
 	switch class {
 	case InstrGeneral:

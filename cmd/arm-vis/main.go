@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	tc "github.com/wayneashleyberry/truecolor/pkg/color"
 	"github.com/zyedidia/armvis/mra"
 )
 
@@ -141,5 +142,10 @@ func main() {
 	err = png.Encode(of, img)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	for i := uint8(0); i < uint8(len(theme.colors)); i++ {
+		c := theme.colors[i]
+		tc.Black().Background(c.R, c.G, c.B).Println(mra.IDToClass(i))
 	}
 }
