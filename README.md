@@ -27,7 +27,7 @@ To generate the images from scratch, first download the MRA for AArch64 and extr
 
 ```
 $ arm-classify MRA_ISA > data/arm64.json
-$ go run cmd/arm-gen/decode_gen.go data/arm64.json # regenerate decode.go
+$ go run cmd/arm-gen/decode_gen.go data/arm64.json > cmd/arm-gen/decode.go # regenerate decode.go
 $ go install ./cmd/arm-gen # rebuild arm-gen
 $ arm-gen -o data/arm64.dat
 $ arm-map -data data/arm64.dat -json data/arm64.json > data/arm64.map
