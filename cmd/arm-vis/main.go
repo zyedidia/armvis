@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"flag"
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -146,6 +147,8 @@ func main() {
 
 	for i := uint8(0); i < uint8(len(theme.colors)); i++ {
 		c := theme.colors[i]
-		tc.Black().Background(c.R, c.G, c.B).Println(mra.IDToClass(i))
+		tc.Black().Background(c.R, c.G, c.B).Print(mra.IDToClass(i))
+		fmt.Print(" ")
 	}
+	fmt.Println()
 }
