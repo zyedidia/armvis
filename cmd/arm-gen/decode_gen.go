@@ -11,7 +11,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/zyedidia/armnalyzer/mra"
+	"github.com/zyedidia/armvis/mra"
 )
 
 func xMask(bits string) string {

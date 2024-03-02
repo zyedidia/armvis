@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/zyedidia/armnalyzer/mra"
+	"github.com/zyedidia/armvis/mra"
 )
 
 type Palette struct {

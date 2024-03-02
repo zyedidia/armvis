@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/zyedidia/armnalyzer/mra"
+	"github.com/zyedidia/armvis/mra"
 )
 
 func main() {
