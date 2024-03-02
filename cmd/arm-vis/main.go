@@ -60,8 +60,15 @@ var monokai = Palette{
 	},
 }
 
+var themes = map[string]Palette{
+	"monokai":   monokai,
+	"solarized": solarized,
+}
+
 func main() {
 	out := flag.String("o", "arm64.png", "output file")
+	themename := flag.String("theme", "solarized", "color theme (solarized,monokai)")
+
 	flag.Parse()
 	args := flag.Args()
 	if len(args) <= 0 {
@@ -80,7 +87,10 @@ func main() {
 	bg := image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{width, height}})
 	overlays := make(map[uint8]*image.RGBA)
 
-	theme := solarized
+	if _, ok := themes[*themename]; !ok {
+		log.Fatalf("theme %s does not exist", *themename)
+	}
+	theme := themes[*themename]
 
 	for i := range theme.colors {
 		overlays[i] = image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{width, height}})
