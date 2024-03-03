@@ -14,10 +14,12 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-8">
-                <canvas id="canvas" style="width: 100%; image-rendering: pixelated;"></canvas>
+                <canvas id="canvas" width="4096" height="4096" style="width: 100%; image-rendering: pixelated;"></canvas>
             </div>
             <div class="col-4">
-                <h2>Overview</h2>
+                <h2>Info</h2>
+                <pre id="hoverbox"></pre>
+                <pre id="codebox" style="height: 30pc; overflow-y: scroll"></pre>
             </div>
         </div>
     </div>
@@ -33,6 +35,10 @@
     c.onclick = ev => {
         const coord = getMousePos(c, ev);
         mouseClick(coord.x, coord.y);
+    };
+    c.onmousemove = ev => {
+        const coord = getMousePos(c, ev);
+        mouseMove(coord.x, coord.y);
     };
 
     const zoom = Panzoom(c, {
@@ -56,17 +62,46 @@
         return s;
     }
 
+    function mouseMove(x, y) {
+        let s = xyToHilbert(x, y, 12)
+        let insn = s * 256;
+        var out = ""
+        for (var i = 0; i < funcs.length; i++) {
+            if (funcs[i](insn)) {
+                out += "0x" + insn.toString(16) + ": " + arm64_json[i].Name + " (" + arm64_json[i].InstrClass + ")";
+                break;
+            }
+        }
+        if (out == "") {
+            out = "\n";
+        }
+        document.getElementById("hoverbox").innerHTML = out;
+    }
+
     function mouseClick(x, y) {
         let s = xyToHilbert(x, y, 12)
         let insn_start = s * 256;
+        var out = "";
+        var n = 0;
         for (var insn = insn_start; insn < insn_start + 256; insn++) {
             for (var i = 0; i < funcs.length; i++) {
                 if (funcs[i](insn)) {
-                    console.log(insn, arm64_json[i]);
+                    var info = arm64_json[i];
+                    out += "0x" + insn.toString(16) + ": " + info.Name + " (" + info.InstrClass + ")";
+                    if (info.Variants != "") {
+                        out += ", " + info.Variants;
+                    }
+                    if (info.Features != "") {
+                        out += ", " + info.Features;
+                    }
+                    out += "\n";
+                    n++;
                     break;
                 }
             }
         }
+        out = "instructions: " + n + "\n" + out;
+        document.getElementById("codebox").innerHTML = out;
     }
 
     function getMousePos(canvas, ev) {
