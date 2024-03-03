@@ -134,13 +134,16 @@ func main() {
 		}
 
 		fmt.Println("bool (*funcs[])(uint32_t) = {")
+		n := 0
 		for i, r := range records {
 			if r.Variants != "" {
 				continue
 			}
 			fmt.Printf("&parse_%d,\n", i)
+			n++
 		}
 		fmt.Println("};")
+		fmt.Printf("uint64_t n_funcs = %d;\n", n)
 		return
 	}
 
