@@ -87,16 +87,13 @@ func main() {
 
 	img := image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{width, height}})
 	bg := image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{width, height}})
-	overlays := make(map[uint8]*image.RGBA)
 
 	if _, ok := themes[*themename]; !ok {
 		log.Fatalf("theme %s does not exist", *themename)
 	}
 	theme := themes[*themename]
 
-	for i := range theme.colors {
-		overlays[i] = image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{width, height}})
-	}
+	overlay := image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{width, height}})
 
 	// Fill background
 	for x := 0; x < width; x++ {
@@ -123,17 +120,18 @@ func main() {
 				}
 				c.A = uint8(a - 1)
 				if c.A > 0 {
-					overlays[uint8(i)].Set(int(x), int(y), c)
+					_, _, _, a := overlay.At(int(x), int(y)).RGBA()
+					if c.A > uint8(a) {
+						overlay.Set(int(x), int(y), c)
+					}
 				}
 				break
 			}
 		}
 	}
 
-	draw.Over.Draw(img, img.Bounds(), bg, image.Point{})
-	for _, o := range overlays {
-		draw.Over.Draw(img, img.Bounds(), o, image.Point{})
-	}
+	draw.Draw(img, img.Bounds(), bg, image.Point{0, 0}, draw.Src)
+	draw.DrawMask(img, img.Bounds(), overlay, image.Point{0, 0}, overlay, image.Point{0, 0}, draw.Over)
 
 	// Encode as PNG.
 	of, err := os.Create(*out)
