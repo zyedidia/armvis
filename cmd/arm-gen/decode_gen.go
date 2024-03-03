@@ -78,13 +78,22 @@ func GenerateRegParseFunc(i int, diagram string) string {
 func GenerateRegParseFuncJS(i int, diagram string) string {
 	buf := &bytes.Buffer{}
 	fmt.Fprintf(buf, "function parse_%d(insn) {\n", i)
-	fmt.Fprintf(buf, "\treturn %s\n", GenerateRegParseExpr(diagram))
+	fmt.Fprintf(buf, "\treturn %s;\n", GenerateRegParseExpr(diagram))
+	fmt.Fprintf(buf, "}\n")
+	return buf.String()
+}
+
+func GenerateRegParseFuncCBase(i int, diagram string) string {
+	buf := &bytes.Buffer{}
+	fmt.Fprintf(buf, "static bool parse_%d(uint32_t insn) {\n", i)
+	fmt.Fprintf(buf, "\treturn %s;\n", GenerateRegParseExpr(diagram))
 	fmt.Fprintf(buf, "}\n")
 	return buf.String()
 }
 
 func main() {
 	js := flag.Bool("js", false, "emit javascript")
+	cbase := flag.Bool("cbase", false, "emit C for matching ARMv8.0 base")
 
 	flag.Parse()
 	args := flag.Args()
@@ -111,6 +120,27 @@ func main() {
 		for i, r := range records {
 			fmt.Println(GenerateRegParseFuncJS(i, r.RegDiagram))
 		}
+		return
+	}
+
+	if *cbase {
+		fmt.Println("#include <stdbool.h>")
+		fmt.Println("#include <stdint.h>")
+		for i, r := range records {
+			if r.Variants != "" {
+				continue
+			}
+			fmt.Println(GenerateRegParseFuncCBase(i, r.RegDiagram))
+		}
+
+		fmt.Println("bool (*funcs[])(uint32_t) = {")
+		for i, r := range records {
+			if r.Variants != "" {
+				continue
+			}
+			fmt.Printf("&parse_%d,\n", i)
+		}
+		fmt.Println("};")
 		return
 	}
 

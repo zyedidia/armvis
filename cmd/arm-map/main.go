@@ -11,6 +11,9 @@ import (
 	"github.com/zyedidia/armvis/mra"
 )
 
+// map format is
+// <32-bit value> (<class>:<subclass>:<count> )*
+
 func main() {
 	armdat := flag.String("data", "arm64.dat", "full arm64 data file")
 	armjson := flag.String("json", "arm64.json", "arm64 JSON encodings file")
@@ -56,9 +59,8 @@ func main() {
 		if one {
 			fmt.Printf("%d ", uint32(i))
 			for i, c := range classes {
-				fmt.Printf("%d", c)
-				if i != len(classes)-1 {
-					fmt.Print(" ")
+				if c != 0 {
+					fmt.Printf("%d:%d:%d ", i, i, c)
 				}
 			}
 			fmt.Println()

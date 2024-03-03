@@ -67,9 +67,17 @@ var themes = map[string]Palette{
 	"solarized": solarized,
 }
 
+func toInt(s string) int {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return i
+}
+
 func main() {
 	out := flag.String("o", "arm64.png", "output file")
-	themename := flag.String("theme", "solarized", "color theme (solarized,monokai)")
+	themename := flag.String("theme", "monokai", "color theme (monokai,solarized)")
 
 	flag.Parse()
 	args := flag.Args()
@@ -95,7 +103,7 @@ func main() {
 
 	overlay := image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{width, height}})
 
-	// Fill background
+	// Fill background.
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {
 			bg.Set(x, y, theme.bg)
@@ -111,22 +119,23 @@ func main() {
 		}
 		x, y := hilbertXY(uint32(s)/256, hilbertOrder)
 		c := theme.bg
-		for i, f := range fields[1:] {
-			if f != "0" {
-				c = theme.colors[uint8(i)]
-				a, err := strconv.Atoi(f)
-				if err != nil {
-					log.Fatal(err)
-				}
-				c.A = uint8(a - 1)
-				if c.A > 0 {
-					_, _, _, a := overlay.At(int(x), int(y)).RGBA()
-					if c.A > uint8(a) {
-						overlay.Set(int(x), int(y), c)
-					}
-				}
-				break
+		for _, f := range fields[1:] {
+			parts := strings.Split(f, ":")
+			if len(parts) != 3 {
+				log.Fatal("each field should be of the form <class>:<subclass>:<count>")
 			}
+			i := toInt(parts[0])
+			// subclass := toInt(parts[1])
+			count := toInt(parts[2])
+			c = theme.colors[uint8(i)]
+			c.A = uint8(count - 1)
+			if c.A > 0 {
+				_, _, _, a := overlay.At(int(x), int(y)).RGBA()
+				if c.A > uint8(a) {
+					overlay.Set(int(x), int(y), c)
+				}
+			}
+			break
 		}
 	}
 
