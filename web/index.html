@@ -1,68 +1,81 @@
 <!DOCTYPE html>
 <html>
+    <head>
+
+    <script type='text/javascript' src='./js/bootstrap.min.js'></script>
+    <script type='text/javascript' src='./js/panzoom.min.js'></script>
+    <script type='text/javascript' src='./js/decode.js'></script>
+    <script type='text/javascript' src='./js/arm64.js'></script>
+    <link rel='stylesheet' href='./css/bootstrap.min.css'>
+
+
+    </head>
 <body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-8">
+                <canvas id="canvas" style="width: 100%; image-rendering: pixelated;"></canvas>
+            </div>
+            <div class="col-4">
+                <h2>Overview</h2>
+            </div>
+        </div>
+    </div>
+    <script>
+    var c = document.getElementById("canvas");
+    var ctx = c.getContext("2d");
+    drawing = new Image();
+    drawing.src = "arm64.png";
+    drawing.onload = function() {
+        ctx.imageSmoothingEnabled=false;
+        ctx.drawImage(drawing, 0, 0, 4096, 4096);
+    };
+    c.onclick = ev => {
+        const coord = getMousePos(c, ev);
+        mouseClick(coord.x, coord.y);
+    };
 
-<canvas id="canvas" width="4096" height="4096" style="image-rendering: pixelated;"></canvas>
+    const zoom = Panzoom(c, {
+      maxScale: 200,
+      cursor: ''
+    });
+    c.addEventListener('wheel', zoom.zoomWithWheel);
 
-<script type='text/javascript' src='./js/panzoom.min.js'></script>
-<script type='text/javascript' src='./js/decode.js'></script>
-<script type='text/javascript' src='./js/arm64.js'></script>
-
-<script>
-var c = document.getElementById("canvas");
-var ctx = c.getContext("2d");
-drawing = new Image();
-drawing.src = "arm64.png";
-drawing.onload = function() {
-    ctx.drawImage(drawing, 0, 0, 4096, 4096);
-};
-c.onclick = ev => {
-    const coord = getMousePos(c, ev);
-    mouseClick(coord.x, coord.y);
-};
-
-const zoom = Panzoom(c, {
-  maxScale: 200,
-  cursor: ''
-});
-c.addEventListener('wheel', zoom.zoomWithWheel);
-
-function xyToHilbert(x, y, order) {
-    let s = 0;
-    for (let i = order - 1; i >= 0; i--) {
-        const xi = (x >> i) & 1;
-        const yi = (y >> i) & 1;
-        if (yi == 0) {
-            const tmp = x;
-            x = y ^ (-xi);
-            y = tmp ^ (-xi);
+    function xyToHilbert(x, y, order) {
+        let s = 0;
+        for (let i = order - 1; i >= 0; i--) {
+            const xi = (x >> i) & 1;
+            const yi = (y >> i) & 1;
+            if (yi == 0) {
+                const tmp = x;
+                x = y ^ (-xi);
+                y = tmp ^ (-xi);
+            }
+            s = 4 * s + 2 * xi + (xi ^ yi);
         }
-        s = 4 * s + 2 * xi + (xi ^ yi);
+        return s;
     }
-    return s;
-}
 
-function mouseClick(x, y) {
-    let s = xyToHilbert(x, y, 12)
-    let insn_start = s * 256;
-    for (var insn = insn_start; insn < insn_start + 256; insn++) {
-        for (var i = 0; i < funcs.length; i++) {
-            if (funcs[i](insn)) {
-                console.log(insn, arm64_json[i]);
-                break;
+    function mouseClick(x, y) {
+        let s = xyToHilbert(x, y, 12)
+        let insn_start = s * 256;
+        for (var insn = insn_start; insn < insn_start + 256; insn++) {
+            for (var i = 0; i < funcs.length; i++) {
+                if (funcs[i](insn)) {
+                    console.log(insn, arm64_json[i]);
+                    break;
+                }
             }
         }
     }
-}
 
-function getMousePos(canvas, ev) {
-    const rect = canvas.getBoundingClientRect();
-    return {
-        x: (((ev.clientX - rect.left) / (rect.right - rect.left)) * canvas.width) | 0,
-        y: (((ev.clientY - rect.top) / (rect.bottom - rect.top)) * canvas.height) | 0
-    };
-}
-</script>
-
+    function getMousePos(canvas, ev) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: (((ev.clientX - rect.left) / (rect.right - rect.left)) * canvas.width) | 0,
+            y: (((ev.clientY - rect.top) / (rect.bottom - rect.top)) * canvas.height) | 0
+        };
+    }
+    </script>
 </body>
 </html>
