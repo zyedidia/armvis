@@ -84,16 +84,7 @@
         const dat = ctx.getImageData(0, 0, c.width, c.height);
         const coord = getMousePos(c, ev);
         mouseMove(coord.x, coord.y);
-        setPixelColor(dat, coord.x, coord.y, 0xffffffff, c.width)
     };
-
-    function setPixelColor(img, x, y, color, w) {
-        const off = ((y * w) + x) * 4;
-        img.data[off + 0] = (color >>> 24) & 0xff;
-        img.data[off + 1] = (color >>> 16) & 0xff;
-        img.data[off + 2] = (color >>> 8) & 0xff;
-        img.data[off + 3] = (color >>> 0) & 0xff;
-    }
 
     const zoom = Panzoom(c, {
       maxScale: 200,
