@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "capstone-wasm": "^1.0.3"
+  }
+}

@@ -29,7 +29,32 @@
             </div>
         </div>
     </div>
-    <script>
+    <script type='module'>
+    import {
+      Const, Capstone, loadCapstone,
+    } from './js/node_modules/capstone-wasm/dist/index.mjs'
+
+    await loadCapstone()
+
+    function toBytes(x) {
+        return [
+            x & 0xff,
+            (x >> 8) & 0xff,
+            (x >> 16) & 0xff,
+            (x >> 24) & 0xff
+        ]
+    }
+
+    const capstone = new Capstone(Const.CS_ARCH_ARM64, 0)
+
+    function decode(encoded) {
+        const code = toBytes(encoded);
+        const insns = capstone.disasm(code, {
+            address: 0,
+        })
+        return insns[0].mnemonic + " " + insns[0].opStr;
+    }
+
     select();
     var c = document.getElementById("canvas");
     var ctx = c.getContext("2d");
@@ -52,8 +77,7 @@
         var c = document.getElementById("canvas");
         var sel = document.getElementById("images");
         var ctx = c.getContext("2d");
-        drawing = new Image();
-        console.log("changing image");
+        var drawing = new Image();
         if (sel.value == "class") {
             drawing.src = "arm64.png";
         } else if (sel.value == "lfi") {
@@ -86,11 +110,18 @@
         var out = ""
 loop:
         for (var insn = insn_start; insn < insn_start + 256; insn++) {
-            for (var i = 0; i < funcs.length; i++) {
-                if (funcs[i](insn)) {
-                    out += "0x" + insn.toString(16) + ": " + arm64_json[i].Name + " (" + arm64_json[i].InstrClass + ")";
-                    break loop;
+            try {
+                out = "0x" + insn.toString(16) + ": " + decode(insn);
+                for (var i = 0; i < funcs.length; i++) {
+                    if (funcs[i](insn)) {
+                        var info = arm64_json[i];
+                        out += " (" + info.InstrClass + ")";
+                        break;
+                    }
                 }
+                break loop;
+            } catch (error) {
+
             }
         }
         if (out == "") {
@@ -105,20 +136,25 @@ loop:
         var out = "";
         var n = 0;
         for (var insn = insn_start; insn < insn_start + 256; insn++) {
-            for (var i = 0; i < funcs.length; i++) {
-                if (funcs[i](insn)) {
-                    var info = arm64_json[i];
-                    out += "0x" + insn.toString(16) + ": " + info.Name + " (" + info.InstrClass + ")";
-                    if (info.Variants != "") {
-                        out += ", " + info.Variants;
+            try {
+                out += "0x" + insn.toString(16) + ": " + decode(insn);
+                for (var i = 0; i < funcs.length; i++) {
+                    if (funcs[i](insn)) {
+                        var info = arm64_json[i];
+                        out += " (" + info.InstrClass + ")";
+                        if (info.Variants != "") {
+                            out += ", " + info.Variants;
+                        }
+                        if (info.Features != "") {
+                            out += ", " + info.Features;
+                        }
+                        out += "\n";
+                        n++;
+                        break;
                     }
-                    if (info.Features != "") {
-                        out += ", " + info.Features;
-                    }
-                    out += "\n";
-                    n++;
-                    break;
                 }
+            } catch (error) {
+
             }
         }
         out = n + " instructions at 0x" + insn_start.toString(16) + "\n" + out;
