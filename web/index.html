@@ -104,6 +104,16 @@
         return s;
     }
 
+    function instrInfoFull(insn) {
+        for (var i = 0; i < funcs.length; i++) {
+            if (funcs[i](insn)) {
+                var info = arm64_json[i];
+                return info.Name + " (" + info.InstrClass + ")";
+            }
+        }
+        return "";
+    }
+
     function mouseMove(x, y) {
         let s = xyToHilbert(x, y, 12)
         let insn_start = s * 256;
@@ -121,7 +131,11 @@ loop:
                 }
                 break loop;
             } catch (error) {
-
+                var i = instrInfoFull(insn);
+                if (i != "") {
+                    out = "0x" + insn.toString(16) + ": " + i;
+                    break;
+                }
             }
         }
         if (out == "") {
@@ -154,7 +168,21 @@ loop:
                     }
                 }
             } catch (error) {
-
+                for (var i = 0; i < funcs.length; i++) {
+                    if (funcs[i](insn)) {
+                        var info = arm64_json[i];
+                        out += "0x" + insn.toString(16) + ": " + info.Name + " (" + info.InstrClass + ")";
+                        if (info.Variants != "") {
+                            out += ", " + info.Variants;
+                        }
+                        if (info.Features != "") {
+                            out += ", " + info.Features;
+                        }
+                        out += "\n";
+                        n++;
+                        break;
+                    }
+                }
             }
         }
         out = n + " instructions at 0x" + insn_start.toString(16) + "\n" + out;
