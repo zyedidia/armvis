@@ -33,6 +33,7 @@ $ arm-classify MRA_ISA > data/arm64.json
 $ go run cmd/arm-gen/decode_gen.go data/arm64.json > cmd/arm-gen/decode.go # regenerate decode.go
 $ go install ./cmd/arm-gen # rebuild arm-gen
 $ arm-gen -o data/arm64.dat
+$ make -C capstone && ./postprocess/capstone data/arm64.dat
 $ arm-map -data data/arm64.dat -json data/arm64.json > data/arm64.map
 $ arm-vis -o img/arm64.png -theme monokai data/arm64.map
 ```

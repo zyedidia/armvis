@@ -14,6 +14,11 @@ import (
 // map format is
 // <32-bit value> (<class>:<subclass>:<count> )*
 
+type line struct {
+	class    uint16
+	subclass uint16
+}
+
 func main() {
 	armdat := flag.String("data", "arm64.dat", "full arm64 data file")
 	armjson := flag.String("json", "arm64.json", "arm64 JSON encodings file")
@@ -39,7 +44,7 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println("mapping...")
-	classes := make([]uint16, mra.InstrNumIDs+1)
+	classes := make([]line, mra.InstrNumIDs+1)
 	n := 256
 	for i := 0; i < len(b); i += n {
 		if i%10000000 == 0 {

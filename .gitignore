@@ -2,3 +2,5 @@ data
 pipeline.txt
 todo.txt
 arm64.png
+capstone
+*.o
