@@ -123,15 +123,14 @@
 loop:
         for (var insn = insn_start; insn < insn_start + 256; insn++) {
             try {
-                out = "0x" + insn.toString(16) + ": " + decode(insn);
                 for (var i = 0; i < funcs.length; i++) {
                     if (funcs[i](insn)) {
+                        out = "0x" + insn.toString(16) + ": " + decode(insn);
                         var info = arm64_json[i];
                         out += " (" + info.InstrClass + ")";
-                        break;
+                        break loop;
                     }
                 }
-                break loop;
             } catch (error) {
                 var i = instrInfoFull(insn);
                 if (i != "") {
@@ -153,9 +152,9 @@ loop:
         var n = 0;
         for (var insn = insn_start; insn < insn_start + 256; insn++) {
             try {
-                out += "0x" + insn.toString(16) + ": " + decode(insn);
                 for (var i = 0; i < funcs.length; i++) {
                     if (funcs[i](insn)) {
+                        out += "0x" + insn.toString(16) + ": " + decode(insn);
                         var info = arm64_json[i];
                         out += " (" + info.InstrClass + ")";
                         if (info.Variants != "") {
