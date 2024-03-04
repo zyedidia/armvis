@@ -199,8 +199,8 @@ func (r RegDiagram) String() string {
 			if bit.Cols == 0 {
 				bit.Cols = 1
 			}
-			bit.Value = strings.ReplaceAll(bit.Value, "(1)", "1")
-			bit.Value = strings.ReplaceAll(bit.Value, "(0)", "0")
+			bit.Value = strings.ReplaceAll(bit.Value, "(1)", "x")
+			bit.Value = strings.ReplaceAll(bit.Value, "(0)", "x")
 			fmt.Fprint(b, strings.Repeat(bit.Value, bit.Cols))
 		}
 		if i != len(r.Boxes)-1 {

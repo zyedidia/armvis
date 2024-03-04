@@ -10,8 +10,19 @@ import (
 	"sync"
 )
 
+func decode(insn uint32) int16 {
+	for j, fn := range funcs {
+		if fn(insn) {
+			return int16(j)
+		}
+	}
+	return -1
+}
+
 func main() {
 	out := flag.String("o", "arm64.dat", "otput file")
+
+	flag.Parse()
 
 	f, err := os.Create(*out)
 	if err != nil {
@@ -33,17 +44,7 @@ func main() {
 				if tid == 0 && i%200000 == 0 {
 					fmt.Printf("%.1f\n", float64(i)/float64(end)*100.0)
 				}
-				found := false
-				for j, fn := range funcs {
-					if fn(insn) {
-						vals[i] = int16(j)
-						found = true
-						break
-					}
-				}
-				if !found {
-					vals[i] = -1
-				}
+				vals[i] = decode(insn)
 			}
 			wg.Done()
 		}(uint64(t))
