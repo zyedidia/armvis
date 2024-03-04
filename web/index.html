@@ -29,6 +29,24 @@
             </div>
         </div>
     </div>
+    <script>
+        function select() {
+            var c = document.getElementById("canvas");
+            var sel = document.getElementById("images");
+            var ctx = c.getContext("2d");
+            var drawing = new Image();
+            if (sel.value == "class") {
+                drawing.src = "arm64.png";
+            } else if (sel.value == "lfi") {
+                drawing.src = "lfi.png";
+            }
+            drawing.onload = function() {
+                ctx.imageSmoothingEnabled = false;
+                ctx.drawImage(drawing, 0, 0, 4096, 4096);
+            };
+        }
+
+    </script>
     <script type='module'>
     import {
       Const, Capstone, loadCapstone,
@@ -72,22 +90,6 @@
       cursor: ''
     });
     c.addEventListener('wheel', zoom.zoomWithWheel);
-
-    function select() {
-        var c = document.getElementById("canvas");
-        var sel = document.getElementById("images");
-        var ctx = c.getContext("2d");
-        var drawing = new Image();
-        if (sel.value == "class") {
-            drawing.src = "arm64.png";
-        } else if (sel.value == "lfi") {
-            drawing.src = "lfi.png";
-        }
-        drawing.onload = function() {
-            ctx.imageSmoothingEnabled = false;
-            ctx.drawImage(drawing, 0, 0, 4096, 4096);
-        };
-    }
 
     function xyToHilbert(x, y, order) {
         let s = 0;
